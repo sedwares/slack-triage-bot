@@ -1,0 +1,45 @@
+# =============================================================================
+# Local Postgres for development.
+#
+#   docker compose up -d
+#   make migrate && make seed
+#
+# Port 5433 on the host deliberately, not 5432: if you already run Postgres
+# locally you will not spend an afternoon wondering why migrations applied to
+# the wrong database.
+# =============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: triage-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: triage
+      POSTGRES_PASSWORD: triage_local_dev   # local only; production uses secrets
+      POSTGRES_DB: triage
+      # C collation keeps text index behaviour identical across machines.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Migrations run immediately after `up`, so waiting for a real readiness
+      # signal rather than sleeping avoids a flaky first-run experience.
+      test: ["CMD-SHELL", "pg_isready -U triage -d triage"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+    command:
+      - "postgres"
+      # Verbose statement logging is a development affordance. Turn it off
+      # before pointing this file at anything real.
+      - "-c"
+      - "log_statement=none"
+      - "-c"
+      - "log_min_duration_statement=200"
+
+volumes:
+  pgdata:
+    name: triage_pgdata

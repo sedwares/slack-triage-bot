@@ -1,0 +1,15 @@
+# Core runtime
+slack-bolt==1.21.2          # includes slack-sdk; Socket Mode via AsyncSocketModeHandler
+anthropic==0.40.0           # AsyncAnthropic client
+asyncpg==0.30.0             # async Postgres driver; no ORM in the hot path
+pydantic==2.9.2
+pydantic-settings==2.6.1    # typed config from environment
+structlog==24.4.0           # structured JSON logging from day one
+python-dotenv==1.0.1
+aiohttp==3.10.10            # required by slack-bolt's async Socket Mode handler
+
+# Development / test
+pytest==8.3.3
+pytest-asyncio==0.24.0
+ruff==0.7.4
+mypy==1.13.0
